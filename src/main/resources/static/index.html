@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMails</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 36px;
+        }
+
+        #auth-section, #app-section {
+            background: #181a20;
+            border: 1px solid #2a2d35;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        #app-section {
+            max-width: 700px;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: #12131a;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #888;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #2a2d35;
+            color: #fff;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: #bbb;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #2a2d35;
+            border-radius: 8px;
+            background: #12131a;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #4a7cff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4a7cff;
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover { background: #3a6aee; }
+        .btn-primary:disabled { background: #333; color: #666; cursor: wait; }
+
+        .btn-secondary {
+            background: #2a2d35;
+            color: #ccc;
+        }
+
+        .btn-secondary:hover { background: #353840; }
+
+        .btn-small {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        .msg {
+            font-size: 0.85rem;
+            margin-top: 12px;
+            min-height: 20px;
+        }
+
+        .msg.error { color: #ff6b6b; }
+        .msg.success { color: #51cf66; }
+
+        /* App section */
+        .user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2a2d35;
+        }
+
+        .user-bar span {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .user-bar strong {
+            color: #4a7cff;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .search-bar .btn { flex-shrink: 0; }
+
+        .status-bar {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 12px;
+            min-height: 20px;
+        }
+
+        .download-bar {
+            margin-bottom: 16px;
+        }
+
+        #results {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #results li {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1e2028;
+            font-size: 0.9rem;
+            color: #ccc;
+            transition: background 0.15s;
+        }
+
+        #results li:hover {
+            background: #1e2028;
+        }
+
+        #results::-webkit-scrollbar { width: 6px; }
+        #results::-webkit-scrollbar-track { background: transparent; }
+        #results::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 3px; }
+    </style>
+</head>
+<body>
+<h1>JMails</h1>
+<p class="subtitle">search engine</p>
+
+<!-- AUTH -->
+<div id="auth-section">
+    <div class="tab-bar">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <div id="login-form">
+        <label>Username</label>
+        <input type="text" id="login-user">
+        <label>Password</label>
+        <input type="password" id="login-pass">
+        <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+        <p class="msg" id="login-msg"></p>
+    </div>
+
+    <div id="register-form" style="display:none;">
+        <label>Username</label>
+        <input type="text" id="reg-user">
+        <label>Password</label>
+        <input type="password" id="reg-pass">
+        <button class="btn btn-primary" onclick="doRegister()">Crear cuenta</button>
+        <p class="msg" id="reg-msg"></p>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app-section" style="display:none;">
+    <div class="user-bar">
+        <span>Sesión de <strong id="display-user"></strong></span>
+        <button class="btn btn-secondary btn-small" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Buscar coincidencias..." onkeydown="if(event.key==='Enter') doSearch()">
+        <button class="btn btn-primary" id="search-btn" onclick="doSearch()" style="width:auto;">Buscar</button>
+    </div>
+
+    <p class="status-bar" id="status-bar"></p>
+
+    <div class="download-bar">
+        <button class="btn btn-secondary btn-small" id="download-btn" onclick="doDownload()" style="display:none;">Descargar resultados (.json)</button>
+    </div>
+
+    <ul id="results"></ul>
+</div>
+
+<script>
+    const API_BASE = window.location.origin;
+
+    let token = localStorage.getItem('jmails_token') || null;
+    let username = localStorage.getItem('jmails_user') || null;
+    let lastResults = null;
+    let lastQuery = '';
+
+    (function init() {
+        if (token && username) showApp();
+    })();
+
+    function switchTab(tab) {
+        document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+        document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+        document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+        document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    }
+
+    async function doLogin() {
+        const user = document.getElementById('login-user').value.trim();
+        const pass = document.getElementById('login-pass').value;
+        const msg = document.getElementById('login-msg');
+        msg.textContent = ''; msg.className = 'msg';
+        if (!user || !pass) { msg.textContent = 'Rellena ambos campos'; msg.classList.add('error'); return; }
+        try {
+            const res = await fetch(API_BASE + '/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            if (!res.ok) { msg.textContent = data.error || 'Error'; msg.classList.add('error'); return; }
+            token = data.token;
+            username = data.username;
+            localStorage.setItem('jmails_token', token);
+            localStorage.setItem('jmails_user', username);
+            showApp();
+        } catch (e) { msg.textContent = 'No se pudo conectar'; msg.classList.add('error'); }
+    }
+
+    async function doRegister() {
+        const user = document.getElementById('reg-user').value.trim();
+        const pass = document.getElementById('reg-pass').value;
+        const msg = document.getElementById('reg-msg');
+        msg.textContent = ''; msg.className = 'msg';
+        if (!user || !pass) { msg.textContent = 'Rellena ambos campos'; msg.classList.add('error'); return; }
+        try {
+            const res = await fetch(API_BASE + '/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            if (!res.ok) { msg.textContent = data.error || 'Error'; msg.classList.add('error'); return; }
+            msg.textContent = 'Cuenta creada. Ahora haz login.';
+            msg.classList.add('success');
+            setTimeout(() => switchTab('login'), 1500);
+        } catch (e) { msg.textContent = 'No se pudo conectar'; msg.classList.add('error'); }
+    }
+
+    function doLogout() {
+        token = null; username = null; lastResults = null;
+        localStorage.removeItem('jmails_token');
+        localStorage.removeItem('jmails_user');
+        document.getElementById('auth-section').style.display = '';
+        document.getElementById('app-section').style.display = 'none';
+        document.getElementById('results').innerHTML = '';
+        document.getElementById('status-bar').textContent = '';
+        document.getElementById('download-btn').style.display = 'none';
+    }
+
+    function showApp() {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('app-section').style.display = '';
+        document.getElementById('display-user').textContent = username;
+        document.getElementById('search-input').focus();
+    }
+
+    async function doSearch() {
+        const texto = document.getElementById('search-input').value.trim();
+        if (!texto) return;
+        const btn = document.getElementById('search-btn');
+        const dlBtn = document.getElementById('download-btn');
+        const results = document.getElementById('results');
+        const status = document.getElementById('status-bar');
+        btn.disabled = true; btn.textContent = 'Buscando...';
+        dlBtn.style.display = 'none';
+        lastResults = null;
+        results.innerHTML = ''; status.textContent = 'Buscando...';
+        try {
+            const res = await fetch(API_BASE + '/api/jmails/buscar?texto=' + encodeURIComponent(texto), {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.status === 401 || res.status === 403) { status.textContent = 'Sesión expirada.'; doLogout(); return; }
+            if (!res.ok) {
+                status.textContent = 'Error en la búsqueda (código ' + res.status + ')';
+                return;
+            }
+            const data = await res.json();
+            if (!data || data.length === 0) { status.textContent = 'Sin resultados.'; return; }
+            lastResults = data;
+            lastQuery = texto;
+            status.textContent = data.length + ' thread(s) encontrado(s)';
+            dlBtn.style.display = '';
+            for (let i = 0; i < data.length; i++) {
+                await new Promise(r => setTimeout(r, 50));
+                const li = document.createElement('li');
+                li.textContent = data[i].nombre;
+                results.appendChild(li);
+            }
+        } catch (e) { status.textContent = 'Error de conexión.'; }
+        finally { btn.disabled = false; btn.textContent = 'Buscar'; }
+    }
+
+    function doDownload() {
+        if (!lastResults) return;
+        const blob = new Blob([JSON.stringify(lastResults, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'jmails_' + lastQuery.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+</script>
+</body>
+</html>
