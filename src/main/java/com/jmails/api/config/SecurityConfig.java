@@ -25,12 +25,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // API sin estado → desactivar CSRF y sesiones
+            // API sin estado → desactivar CSRF
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // CORS para peticiones desde HTML/JS
+
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             // Rutas públicas vs protegidas
@@ -40,7 +40,6 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
             )
 
-            // Añadir el filtro JWT antes del filtro estándar de Spring
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

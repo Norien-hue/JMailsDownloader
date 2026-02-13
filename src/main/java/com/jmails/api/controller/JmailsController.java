@@ -35,8 +35,7 @@ public class JmailsController {
         return ResponseEntity.ok(jmailsService.buscar(texto));
     }
 
-     //Contar total de documentos.
-     // /api/jmails/count
+     //Contar total de correo
 
     @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> contarTotal() {
